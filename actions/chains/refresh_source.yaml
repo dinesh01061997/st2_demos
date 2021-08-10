@@ -1,0 +1,38 @@
+---
+name: refresh_source
+runner_type: action-chain
+description: >
+    Action chain to run the refresh for the given source
+enabled: true
+entry_point: chains/refresh_source.yaml
+parameters:
+    source:
+        required: true
+        type: string
+        description: "Name of the source feed to refresh"
+    force:
+        required: false
+        type: boolean
+        description: "Refresh the source even if it is disabled"
+        default: false
+    partial_refresh:
+        required: false
+        type: boolean
+        default: false
+        description: "rerun selective nvd files"
+
+    skip_notify:
+        default:
+        - refresh
+        - execution_summary
+
+notify:
+    on-failure:
+        routes:
+        - riskdb_notify
+        message: "Error refreshing {{ action_parameters.source }}"
+        data:
+            source: "{{ action_parameters.source }}"
+            route:
+            - chat
+            - email
